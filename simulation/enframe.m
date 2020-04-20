@@ -1,5 +1,5 @@
 function frameout = enframe(x,win,inc)
-    % 加窗口分帧
+    % 加窗分帧
     
     % 输入语音信号x
     % 帧长度/窗函数win
@@ -19,6 +19,7 @@ function frameout = enframe(x,win,inc)
     frameout = zeros(nf,len); % 帧数nf x 帧长len
     indf = inc*(0:(nf-1)).'; % 记录帧移起始点indf
     inds = (1:len); % 每帧数据长度占的点
+    
     frameout(:) = x(indf(:,ones(1,len))+inds(ones(nf,1),:));
     % fprintf('signal length = %f, window size = %f, number of frames = %f\n',nx,nwin,nf);
     % fprintf('size of frames = %f, frame shift = %f, beginnings of each frame:\n',len,inc);indf
