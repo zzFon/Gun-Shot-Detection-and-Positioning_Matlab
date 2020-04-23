@@ -1,4 +1,4 @@
-function [f,t]=enframe(x,win,inc)
+function [f,t,eng]=enframe(x,win,inc)
 %ENFRAME split signal up into (overlapping) frames: one per row. [F,T]=(X,WIN,INC)
 %
 %	F = ENFRAME(X,LEN) splits the vector X(:) up into
@@ -18,7 +18,7 @@ function [f,t]=enframe(x,win,inc)
 %   of each frame. T=i corresponds to the time of sample X(i). 
 %
 
-nx=length(x(:));
+nx=length(x);
 nwin=length(win);
 if (nwin == 1)
    len = win;
@@ -28,6 +28,7 @@ end
 if (nargin < 3)
    inc = len;
 end
+len = nwin;
 nf = fix((nx-len+inc)/inc);
 f=zeros(nf,len);
 indf= inc*(0:(nf-1)).';
@@ -37,8 +38,16 @@ if (nwin > 1)
     w = win(:)';
     f = f .* w(ones(nf,1),:);
 end
-if nargout>1
-    t=(1+len)/2+indf;
-end
+%if nargout>1
+    t = floor((1+len)/2)+indf;
+    %fprintf('size of f\n');
+    szf = size(f);
+    ff = f(:).*f(:);
+    for i = 1:szf(1)
+        %ff = f(i,:).*f(i,:)
+        ff = abs(f(i,:));
+        eng(i) = sum(ff);
+    end
+%end
 
 

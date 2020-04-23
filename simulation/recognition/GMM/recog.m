@@ -2,18 +2,29 @@
 clear all;
 load rec_data.mat;  % 载入待识别语音
 load speaker.mat;   % 载入训练好的模型
-Spk_num=5; %说话人个数
-Tes_num=2;  %每个说话人待识别的语音数目
+Spk_num=2; %说话人个数
+Tes_num=3;  %每个说话人待识别的语音数目
 fs=16000; %采样频率
 ncentres=16; %混合成分数目
 
 load bkg.mat;
+load gun.mat;
 for spk_cyc=1:Spk_num    % 遍历说话人
   for sph_cyc=1:Tes_num  % 遍历语音
      fprintf('detecting speaker %i, record %i, ',spk_cyc,sph_cyc); 
      %speech = rdata{spk_cyc}{sph_cyc};
-     speech = background(spk_cyc*sph_cyc,:);
+     %speech = background(spk_cyc*sph_cyc,:);
+     if spk_cyc == 1
+      	speech = bkg(sph_cyc,:);
+     elseif spk_cyc == 2
+        speech = gun(sph_cyc,:);
+     end
      
+     file_name = 's1.wav';
+     fprintf('checking %s...\n',file_name);
+     [speech,fffff] = audioread(file_name);
+     
+     fprintf('pre-processing...\n');
      %---预处理,特征提取--
      pre_sph=filter([1 -0.97],1,speech);
      win_type='M'; %汉明窗
@@ -24,6 +35,7 @@ for spk_cyc=1:Spk_num    % 遍历说话人
      c=melcepst(pre_sph,fs,win_type,cof_num,fil_num,frm_len,frm_off); %(帧数)*(cof_num)
      cof=c(:,1:end-1); %N*D维矢量
      
+     fprintf('detecting...\n');
      %----识别---
      MLval=zeros(size(cof,1),Spk_num);
      for b=1:Spk_num %说话人循环
@@ -38,7 +50,12 @@ for spk_cyc=1:Spk_num    % 遍历说话人
     logMLval=log((MLval)+eps);
     sumlog=sum(logMLval,1);
     [maxsl,idx]=max(sumlog); % 判决，将最大似然值对应的序号idx作为识别结果
-    fprintf('result: this is speaker %i\n',idx);     
+    fprintf('result: this is speaker %i, ',idx);
+    if idx == spk_cyc
+        fprintf('Right!\n');
+    else
+        fprintf('Wrong!\n');
+    end
      
   end
 end
