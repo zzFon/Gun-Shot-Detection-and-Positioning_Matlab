@@ -36,7 +36,7 @@ for ii = 1:24 % 7 8 wav分别为背景声和背景+枪声，21-24是爆炸声
     
     % 自适应短时能量阈值分割
     %size(energy)
-    threshold = min(energy)+0.2*(max(energy)-min(energy))
+    threshold = min(energy)+0.2*(max(energy)-min(energy));
     processed_energy = energy;
     for i = 1:length(energy)
         processed_energy(i) = 0;
@@ -60,6 +60,9 @@ for ii = 1:24 % 7 8 wav分别为背景声和背景+枪声，21-24是爆炸声
             elseif cnt == 0
                 cnt = 1; %初始化计数器
             end
+            if i == length(processed_energy) && cnt < thr
+                processed_energy((i-cnt):i) = 0;
+            end
         elseif processed_energy(i) == 0
             if cnt > 0
                 if cnt < thr
@@ -68,10 +71,10 @@ for ii = 1:24 % 7 8 wav分别为背景声和背景+枪声，21-24是爆炸声
             end
             cnt = 0;
         end
+        %fprintf('%f, %f\n',i,processed_energy(i));
     end
     
     subplot(3,2,3);hold on;plot(processed_energy*max(energy),'r');hold off;
     subplot(3,2,5);hold on;plot(processed_energy,'r');hold off;
-
 
 end
