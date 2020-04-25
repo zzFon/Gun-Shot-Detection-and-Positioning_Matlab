@@ -1,28 +1,24 @@
 % -- 识别 ---
-clear all;
+% clear all;
 load rec_data.mat;  % 载入待识别语音
 load speaker.mat;   % 载入训练好的模型
-Spk_num=2; %说话人个数
-Tes_num=3;  %每个说话人待识别的语音数目
-fs=16000; %采样频率
-ncentres=16; %混合成分数目
+Spk_num = 2; %说话人个数
+Tes_num = 6;  %每个说话人待识别的语音数目
+% fs=16000; %采样频率
+% ncentres=16; %混合成分数目
 
-load bkg.mat;
-load gun.mat;
+% load bkg.mat;
+% load gun.mat;
 for spk_cyc=1:Spk_num    % 遍历说话人
   for sph_cyc=1:Tes_num  % 遍历语音
-     fprintf('detecting speaker %i, record %i, ',spk_cyc,sph_cyc); 
+     fprintf('detecting speaker %i, record %i\n',spk_cyc,sph_cyc); 
      %speech = rdata{spk_cyc}{sph_cyc};
      %speech = background(spk_cyc*sph_cyc,:);
      if spk_cyc == 1
-      	speech = bkg(sph_cyc,:);
+      	speech = segments_gun(sph_cyc,:);
      elseif spk_cyc == 2
-        speech = gun(sph_cyc,:);
+        speech = segments_explosion(sph_cyc,:);
      end
-     
-     file_name = 's1.wav';
-     fprintf('checking %s...\n',file_name);
-     [speech,fffff] = audioread(file_name);
      
      fprintf('pre-processing...\n');
      %---预处理,特征提取--

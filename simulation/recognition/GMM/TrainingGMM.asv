@@ -15,11 +15,11 @@ ncentres = 4; %混合成分数目
 % load tra_data.mat; 
 % load bkg.mat;
 % load gun.mat
-cnt = 0;
 for spk_cyc = 1:Spk_num    % 遍历说话人
   fprintf('training for speaker %i\n',spk_cyc);
   tag1=1;tag2=1; %用于汇总存储mfcc
   
+  cnt = 0;
   for sph_cyc=1:Tra_num  % 遍历语音
      % speech = tdata{spk_cyc}{sph_cyc}; 
      % size(background)
@@ -29,9 +29,6 @@ for spk_cyc = 1:Spk_num    % 遍历说话人
      elseif spk_cyc == 2
         speech = segments_explosion(sph_cyc,:);
      end
-     cnt = cnt+1;
-     figure(3);
-     subplot(4,3,cnt);plot(speech);
      
       %---预处理,特征提取--
      pre_sph=filter([1 -0.97],1,speech); % 预加重
@@ -64,6 +61,7 @@ for spk_cyc = 1:Spk_num    % 遍历说话人
   speaker{spk_cyc}.pai=mix.priors;
   speaker{spk_cyc}.mu=mix.centres;
   speaker{spk_cyc}.sigma=mix.covars;
+  
 
   clear cof mix;
 end
