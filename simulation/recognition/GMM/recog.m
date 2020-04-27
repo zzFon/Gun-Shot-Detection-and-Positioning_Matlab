@@ -17,7 +17,7 @@ for spk_cyc=1:Spk_num    % 遍历说话人
      if spk_cyc == 1
       	speech = segments_gun(sph_cyc,:);
      elseif spk_cyc == 2
-        speech = segments_explosion(sph_cyc,:);
+        speech = segments_horn(sph_cyc,:);
      end
      
      fprintf('pre-processing...\n');

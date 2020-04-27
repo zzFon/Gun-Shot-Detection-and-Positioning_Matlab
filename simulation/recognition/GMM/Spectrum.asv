@@ -1,0 +1,24 @@
+
+
+for i = 1:num_gun
+    figure(1);
+    subplot(2,3,i);plot(segments_gun(i,:),'r');
+    
+    subplot(2,3,6+i);
+    spectrogram(segments_gun(i,:),256,128,256,16000,'yaxis');
+    xlabel('Ê±¼ä(s)');
+    ylabel('ÆµÂÊ(Hz)');
+    title('background');
+end
+
+for i = 1:num_explosion
+    figure(2);
+    subplot(2,3,i);plot(segments_explosion(i,:),'r');
+    
+    
+end
+
+for i = 1:num_horn
+    figure(3);
+    subplot(2,3,i);plot(segments_horn(i,:),'r');
+end
