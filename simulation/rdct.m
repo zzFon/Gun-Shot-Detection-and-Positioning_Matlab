@@ -1,4 +1,3 @@
-  
 function y=rdct(x,n,a,b)
 %RDCT     Discrete cosine transform of real data Y=(X,N,A,B)
 % Data is truncated/padded to length N.

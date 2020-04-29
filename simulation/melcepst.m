@@ -134,3 +134,4 @@ if nargout<1
 	colormap([map map map]);
 	colorbar;
 end
+
