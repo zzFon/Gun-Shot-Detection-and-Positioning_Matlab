@@ -1,4 +1,6 @@
 
+% first run FileReading & SegmentExtraction
+
 close all;
 for i = 1:num_gun
     figure(1);

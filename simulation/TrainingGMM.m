@@ -48,6 +48,7 @@ for spk_cyc = 1:Spk_num    % 遍历说话人
 %      pause(3);
      
      c=melcepst(pre_sph,fs,win_type,cof_num,fil_num,frm_len,frm_off); % mfcc特征提取
+     size(c)
      cc=c(:,1:end-1)';
      tag2=tag1+size(cc,2);
      cof(:,tag1:tag2-1)=cc;

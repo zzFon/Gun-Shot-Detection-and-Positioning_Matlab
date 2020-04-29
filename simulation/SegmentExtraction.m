@@ -7,6 +7,7 @@
 close all;
 % 提取枪声
 segments_gun = zeros(num_gun,maxlen_gun);
+piece_num_gun = 0;
 for ii = 1:num_gun
     
     figure(1);
@@ -14,7 +15,8 @@ for ii = 1:num_gun
     gun_fft = p2(1:length(data_gun(ii,:))/2+1);
     gun_fft(2:end-1) = 2*gun_fft(2:end-1);
     f = fs*(0:(length(data_gun(ii,:))/2))/length(data_gun(ii,:));
-    subplot(4,3,ii);plot(data_gun(ii,:));xlabel('t / s');title('signal');
+    subplot(4,3,ii);
+    plot(data_gun(ii,:));xlabel('t / s');title('gun');
     %subplot(4,3,6+ii);plot(f,gun_fft);title('spectrum');xlabel('frequency / Hz');
 
     % 短时能量分析
@@ -63,6 +65,8 @@ for ii = 1:num_gun
     subplot(4,3,6+ii);hold on;plot(processed_energy*max(energy),'r');hold off;
     %subplot(3,2,5);hold on;plot(processed_energy,'r');hold off;
     
+    % 片段分割
+    figure(2);
     segments = processed_energy.*t;
     min_seg = length(segments);
     max_seg = 0;
@@ -73,7 +77,24 @@ for ii = 1:num_gun
         if max_seg < segments(i)
             max_seg = segments(i);
         end
+        
+        if i+1 <= length(segments)
+            if segments(i) == 0 && segments(i+1) > 0
+                piece_start = i+1;
+            end
+        end
+        if 1 <= i-1
+            if  segments(i-1) > 0 && segments(i) == 0
+                piece_end = i-1;
+                piece_num_gun = piece_num_gun+1;
+                subplot(4,5,piece_num_gun);
+                plot(data_gun(ii,piece_start:piece_end));
+                title('piece');
+                fprintf('piece: %d of record %d, from %d to %d\n',piece_num_gun,ii,piece_start,piece_end);
+            end
+        end
     end
+    figure(1);
     
     subplot(4,3,ii);
 %     segments_gun = zeros(size(data_gun(ii,:)));
@@ -91,6 +112,7 @@ end
 
 % 提取爆炸
 segments_explosion = zeros(num_horn,maxlen_explosion);
+piece_num_explosion = 0;
 for ii = 1:num_explosion
     
     figure(3);
@@ -98,7 +120,8 @@ for ii = 1:num_explosion
     explosion_fft = p2(1:length(data_explosion(ii,:))/2+1);
     explosion_fft(2:end-1) = 2*explosion_fft(2:end-1);
     f = fs*(0:(length(data_explosion(ii,:))/2))/length(data_explosion(ii,:));
-    subplot(4,3,ii);plot(data_explosion(ii,:));xlabel('t / s');title('signal');
+    subplot(4,3,ii);
+    plot(data_explosion(ii,:));xlabel('t / s');title('explosion');
     %subplot(4,3,6+ii);plot(f,explosion_fft);title('spectrum');xlabel('frequency / Hz');
 
     % 短时能量分析
@@ -155,6 +178,8 @@ for ii = 1:num_explosion
     subplot(4,3,6+ii);hold on;plot(processed_energy*max(energy),'r');hold off;
     %subplot(3,2,5);hold on;plot(processed_energy,'r');hold off;
     
+    % 片段分割
+    figure(4);
     segments = processed_energy.*t;
     min_seg = length(segments);
     max_seg = 0;
@@ -165,7 +190,24 @@ for ii = 1:num_explosion
         if max_seg < segments(i)
             max_seg = segments(i);
         end
+        
+        if i+1 <= length(segments)
+            if segments(i) == 0 && segments(i+1) > 0
+                piece_start = i+1;
+            end
+        end
+        if 1 <= i-1
+            if  segments(i-1) > 0 && segments(i) == 0
+                piece_end = i-1;
+                piece_num_explosion = piece_num_explosion+1;
+                subplot(4,5,piece_num_explosion);
+                plot(data_explosion(ii,piece_start:piece_end));
+                title('piece');
+                fprintf('piece: %d of record %d, from %d to %d\n',piece_num_explosion,ii,piece_start,piece_end);
+            end
+        end
     end
+    figure(3);
     
     subplot(4,3,ii);
 %     segments_gun = zeros(size(data_gun(ii,:)));
@@ -183,6 +225,7 @@ end
 
 % 提取喇叭
 segments_horn = zeros(num_explosion,maxlen_horn);
+piece_num_horn = 0;
 for ii = 1:num_horn
     
     figure(5);
@@ -190,7 +233,8 @@ for ii = 1:num_horn
     horn_fft = p2(1:length(data_horn(ii,:))/2+1);
     horn_fft(2:end-1) = 2*horn_fft(2:end-1);
     f = fs*(0:(length(data_horn(ii,:))/2))/length(data_horn(ii,:));
-    subplot(4,3,ii);plot(data_horn(ii,:));xlabel('t / s');title('signal');
+    subplot(4,3,ii);
+    plot(data_horn(ii,:));xlabel('t / s');title('horn');
     %subplot(4,3,6+ii);plot(f,explosion_fft);title('spectrum');xlabel('frequency / Hz');
 
     % 短时能量分析
@@ -229,8 +273,10 @@ for ii = 1:num_horn
             elseif cnt == 0
                 cnt = 1; %初始化计数器
             end
-            if i == length(processed_energy) && cnt < thr
-                processed_energy((i-cnt):i) = 0;
+            if i == length(processed_energy)
+                if cnt < thr
+                    processed_energy((i-cnt):i) = 0;
+                end
             end
         elseif processed_energy(i) == 0
             if cnt > 0
@@ -247,6 +293,8 @@ for ii = 1:num_horn
     subplot(4,3,6+ii);hold on;plot(processed_energy*max(energy),'r');hold off;
     %subplot(3,2,5);hold on;plot(processed_energy,'r');hold off;
     
+    % 片段分割
+    figure(6);
     segments = processed_energy.*t;
     min_seg = length(segments);
     max_seg = 0;
@@ -257,7 +305,26 @@ for ii = 1:num_horn
         if max_seg < segments(i)
             max_seg = segments(i);
         end
+        
+        if i+1 <= length(segments)
+            if segments(i) == 0 && segments(i+1) > 0
+                piece_start = segments(i+1);
+            end
+        end
+        if 1 <= i-1
+            if  segments(i-1) > 0 && segments(i) == 0
+                piece_end = segments(i-1);
+                piece_num_horn = piece_num_horn+1;
+                subplot(4,5,piece_num_horn);
+                piece_start = ceil(piece_start-N/2);
+                piece_end = floor(piece_end+N/2);
+                plot(data_horn(ii,piece_start:piece_end));
+                title('piece');
+                fprintf('piece: %d of record %d, from %d to %d\n',piece_num_horn,ii,piece_start,piece_end);
+            end
+        end
     end
+    figure(5);
     
     subplot(4,3,ii);
 %     segments_gun = zeros(size(data_gun(ii,:)));
@@ -271,4 +338,5 @@ for ii = 1:num_horn
     segments_horn(ii,5000:5000+length(data_horn(ii,st:en))-1) = data_horn(ii,st:en);
 %     figure(3);
 %     subplot(4,3,6+ii);plot(segments_explosion(ii,:));
+    
 end
