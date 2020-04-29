@@ -30,11 +30,12 @@ for spk_cyc = 1:Spk_num    % 遍历说话人
         speech = segments_horn(sph_cyc,:);
      end
      cnt = cnt+1;
-     figure(3);
+     figure(10);
      subplot(4,3,cnt);plot(speech);
      
       %---预处理,特征提取--
-     pre_sph=filter([1 -0.97],1,speech); % 预加重
+     %pre_sph=filter([1 -0.97],1,speech); % 预加重
+     pre_sph = speech;
      win_type='M'; %汉明窗
      cof_num=20; %倒谱系数个数
      frm_len=fs*0.02; %帧长：20ms

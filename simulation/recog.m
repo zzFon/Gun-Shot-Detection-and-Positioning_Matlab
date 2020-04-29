@@ -15,9 +15,9 @@ for spk_cyc=1:Spk_num    % 遍历说话人
      %speech = rdata{spk_cyc}{sph_cyc};
      %speech = background(spk_cyc*sph_cyc,:);
      if spk_cyc == 1
-      	speech = segments_gun(sph_cyc,:);
+      	speech = segments_horn(sph_cyc,:);
      elseif spk_cyc == 2
-        speech = segments_horn(sph_cyc,:);
+        speech = segments_gun(sph_cyc,:);
      end
      
      fprintf('pre-processing...\n');
@@ -46,6 +46,7 @@ for spk_cyc=1:Spk_num    % 遍历说话人
     logMLval=log((MLval)+eps);
     sumlog=sum(logMLval,1);
     [maxsl,idx]=max(sumlog); % 判决，将最大似然值对应的序号idx作为识别结果
+    %sumlog
     fprintf('result: this is speaker %i, ',idx);
     if idx == spk_cyc
         fprintf('Right!\n');
