@@ -8,6 +8,7 @@ close all;
 % 提取枪声
 segments_gun = zeros(num_gun,maxlen_gun);
 piece_num_gun = 0;
+piece_gun = cell(1,20);
 for ii = 1:num_explosion
     
     figure(1);
@@ -19,13 +20,16 @@ for ii = 1:num_explosion
     subplot(4,3,ii);
     plot(data_gun(ii,:));xlabel('t / s');title('gun');
 
-    % 短时能量分析
+    % 加窗分帧：短时能量计算 & 短时过零率计算 
     N = 300; % 窗宽（张克刚）
     inc = 100; % 帧移（张克刚）
     win = hamming(N);
-    [frameout,t,energy] = enframe(data_gun(ii,:),win,inc);
+    [frameout,t,energy,zcr] = enframe(data_gun(ii,:),win,inc);
     t = t';
     subplot(4,3,6+ii);hold on;plot(energy,'b');title('energy');hold off;
+    figure(11);
+    subplot(4,3,ii);plot(zcr);title('zcr');
+    figure(1);
     
      % 均值滤波
     wnd = 50; % 阶数
@@ -34,6 +38,10 @@ for ii = 1:num_explosion
     sm = filter(b,a,energy);
     subplot(4,3,6+ii);hold on;plot(sm,'k');hold off;
     energy = sm;
+    sm_zcr = filter(b,a,zcr);
+    figure(11);
+    subplot(4,3,ii);hold on;plot(sm_zcr,'k');title('zcr');hold off;
+    figure(1);
     
     % 自适应短时能量阈值分割
     threshold = min(energy)+0.2*(max(energy)-min(energy));
@@ -98,23 +106,24 @@ for ii = 1:num_explosion
             if  segments(i-1) > 0 && segments(i) == 0
                 piece_end = segments(i-1);
                 piece_num_gun = piece_num_gun+1;
+                piece_gun{1,piece_num_gun} = data_gun(ii,piece_start:piece_end);
                 figure(2);
                 subplot(4,5,piece_num_gun);
 %                 piece_start = ceil(piece_start-N/2);
 %                 piece_end = floor(piece_end+N/2);
                 plot(data_gun(ii,piece_start:piece_end));
                 title('piece');
-                fprintf('piece: %d of record %d, from %d to %d\n',piece_num_gun,ii,piece_start,piece_end);
+                fprintf('piece: %d of gun record %d, from %d to %d\n',piece_num_gun,ii,piece_start,piece_end);
                 figure(1);
                 subplot(4,3,ii);
                 hold on;plot(piece_start:piece_end,data_gun(ii,piece_start:piece_end),'r');hold off;
               
-                figure(12);subplot(4,5,piece_num_gun);
-                p2 = abs(fft(data_gun(ii,piece_start:piece_end))/length(data_gun(ii,piece_start:piece_end)));
-                piece_fft = p2(1:length(data_gun(ii,piece_start:piece_end))/2+1);
-                piece_fft(2:end-1) = 2*piece_fft(2:end-1);
-                f = fs*(0:(length(data_gun(ii,piece_start:piece_end))/2))/length(data_gun(ii,piece_start:piece_end));
-                plot(piece_fft);title('spectrum');xlabel('frequency / Hz');
+%                 figure(12);subplot(4,5,piece_num_gun);
+%                 p2 = abs(fft(data_gun(ii,piece_start:piece_end))/length(data_gun(ii,piece_start:piece_end)));
+%                 piece_fft = p2(1:length(data_gun(ii,piece_start:piece_end))/2+1);
+%                 piece_fft(2:end-1) = 2*piece_fft(2:end-1);
+%                 f = fs*(0:(length(data_gun(ii,piece_start:piece_end))/2))/length(data_gun(ii,piece_start:piece_end));
+%                 plot(piece_fft);title('spectrum');xlabel('frequency / Hz');
             end
         end
     end
@@ -140,6 +149,7 @@ end
 % 提取爆炸
 segments_explosion = zeros(num_explosion,maxlen_explosion);
 piece_num_explosion = 0;
+piece_explosion = cell(1,30);
 for ii = 1:num_explosion
     
     figure(3);
@@ -150,15 +160,19 @@ for ii = 1:num_explosion
 %     subplot(4,3,6+ii);plot(f,explosion_fft);title('spectrum');xlabel('frequency / Hz');
     subplot(4,3,ii);
     plot(data_explosion(ii,:));xlabel('t / s');title('explosion');
-
+    
+    
     % 短时能量分析
     N = 300; % 窗宽（张克刚）
     inc = 100; % 帧移（张克刚）
     win = hamming(N);
-    [frameout,t,energy] = enframe(data_explosion(ii,:),win,inc);
+    [frameout,t,energy,zcr] = enframe(data_explosion(ii,:),win,inc);
     t = t';
     subplot(4,3,6+ii);hold on;plot(energy,'b');title('energy');hold off;
-    
+    figure(13);
+    subplot(4,3,ii);plot(zcr);title('zcr');
+    figure(3);
+
      % 均值滤波
     wnd = 50; % 阶数
     b = (1/wnd)*ones(1,wnd);
@@ -166,6 +180,10 @@ for ii = 1:num_explosion
     sm = filter(b,a,energy);
     subplot(4,3,6+ii);hold on;plot(sm,'k');hold off;
     energy = sm;
+    sm_zcr = filter(b,a,zcr);
+    figure(13);
+    subplot(4,3,ii);hold on;plot(sm_zcr,'k');title('zcr');hold off;
+    figure(3);
     
     % 自适应短时能量阈值分割
     threshold = min(energy)+0.2*(max(energy)-min(energy));
@@ -228,23 +246,24 @@ for ii = 1:num_explosion
             if  segments(i-1) > 0 && segments(i) == 0
                 piece_end = segments(i-1);
                 piece_num_explosion = piece_num_explosion+1;
+                piece_explosion{1,piece_num_explosion} = data_explosion(ii,piece_start:piece_end);
                 figure(4);
                 subplot(4,5,piece_num_explosion);
 %                 piece_start = ceil(piece_start-N/2);
 %                 piece_end = floor(piece_end+N/2);
                 plot(data_explosion(ii,piece_start:piece_end));
                 title('piece');
-                fprintf('piece: %d of record %d, from %d to %d\n',piece_num_explosion,ii,piece_start,piece_end);
+                fprintf('piece: %d of explosion record %d, from %d to %d\n',piece_num_explosion,ii,piece_start,piece_end);
                 figure(3);
                 subplot(4,3,ii);
                 hold on;plot(piece_start:piece_end,data_explosion(ii,piece_start:piece_end),'r');hold off;
               
-                figure(14);subplot(4,5,piece_num_explosion);
-                p2 = abs(fft(data_explosion(ii,piece_start:piece_end))/length(data_explosion(ii,piece_start:piece_end)));
-                piece_fft = p2(1:length(data_explosion(ii,piece_start:piece_end))/2+1);
-                piece_fft(2:end-1) = 2*piece_fft(2:end-1);
-                f = fs*(0:(length(data_explosion(ii,piece_start:piece_end))/2))/length(data_explosion(ii,piece_start:piece_end));
-                plot(piece_fft);title('spectrum');xlabel('frequency / Hz');
+%                 figure(14);subplot(4,5,piece_num_explosion);
+%                 p2 = abs(fft(data_explosion(ii,piece_start:piece_end))/length(data_explosion(ii,piece_start:piece_end)));
+%                 piece_fft = p2(1:length(data_explosion(ii,piece_start:piece_end))/2+1);
+%                 piece_fft(2:end-1) = 2*piece_fft(2:end-1);
+%                 f = fs*(0:(length(data_explosion(ii,piece_start:piece_end))/2))/length(data_explosion(ii,piece_start:piece_end));
+%                 plot(piece_fft);title('spectrum');xlabel('frequency / Hz');
             end
         end
     end
@@ -270,6 +289,7 @@ end
 % 提取喇叭
 segments_horn = zeros(num_horn,maxlen_horn);
 piece_num_horn = 0;
+piece_horn = cell(1,30);
 for ii = 1:num_horn
     
     figure(5);
@@ -285,20 +305,27 @@ for ii = 1:num_horn
     N = 300; % 窗宽（张克刚）
     inc = 100; % 帧移（张克刚）
     win = hamming(N);
-    [frameout,t,energy] = enframe(data_horn(ii,:),win,inc);
+    [frameout,t,energy,zcr] = enframe(data_horn(ii,:),win,inc);
     t = t';
     subplot(4,3,6+ii);hold on;plot(energy,'b');title('energy');hold off;
+    figure(15);
+    subplot(4,3,ii);plot(zcr);title('zcr');
+    figure(5);
     
      % 均值滤波
-    wnd = 50; % 阶数
+    wnd = 30; % 阶数
     b = (1/wnd)*ones(1,wnd);
     a = 1;
     sm = filter(b,a,energy);
     subplot(4,3,6+ii);hold on;plot(sm,'k');hold off;
     energy = sm;
+    sm_zcr = filter(b,a,zcr);
+    figure(15);
+    subplot(4,3,ii);hold on;plot(sm_zcr,'k');title('zcr');hold off;
+    figure(5);
     
     % 自适应短时能量阈值分割
-    threshold = min(energy)+0.2*(max(energy)-min(energy));
+    threshold = min(energy)+0.4*(max(energy)-min(energy));
     processed_energy = energy;
     for i = 1:length(energy)
         processed_energy(i) = 0;
@@ -358,23 +385,24 @@ for ii = 1:num_horn
             if  segments(i-1) > 0 && segments(i) == 0
                 piece_end = segments(i-1);
                 piece_num_horn = piece_num_horn+1;
+                piece_horn{1,piece_num_horn} = data_horn(ii,piece_start:piece_end);
                 figure(6);
                 subplot(4,5,piece_num_horn);
 %                 piece_start = ceil(piece_start-N/2);
 %                 piece_end = floor(piece_end+N/2);
                 plot(data_horn(ii,piece_start:piece_end));
                 title('piece');
-                fprintf('piece: %d of record %d, from %d to %d\n',piece_num_horn,ii,piece_start,piece_end);
+                fprintf('piece: %d of horn record %d, from %d to %d\n',piece_num_horn,ii,piece_start,piece_end);
                 figure(5);
                 subplot(4,3,ii);
                 hold on;plot(piece_start:piece_end,data_horn(ii,piece_start:piece_end),'r');hold off;
               
-                figure(16);subplot(4,5,piece_num_horn);
-                p2 = abs(fft(data_horn(ii,piece_start:piece_end))/length(data_horn(ii,piece_start:piece_end)));
-                piece_fft = p2(1:length(data_explosion(ii,piece_start:piece_end))/2+1);
-                piece_fft(2:end-1) = 2*piece_fft(2:end-1);
-                f = fs*(0:(length(data_horn(ii,piece_start:piece_end))/2))/length(data_horn(ii,piece_start:piece_end));
-                plot(piece_fft);title('spectrum');xlabel('frequency / Hz');
+%                 figure(16);subplot(4,5,piece_num_horn);
+%                 p2 = abs(fft(data_horn(ii,piece_start:piece_end))/length(data_horn(ii,piece_start:piece_end)));
+%                 piece_fft = p2(1:length(data_explosion(ii,piece_start:piece_end))/2+1);
+%                 piece_fft(2:end-1) = 2*piece_fft(2:end-1);
+%                 f = fs*(0:(length(data_horn(ii,piece_start:piece_end))/2))/length(data_horn(ii,piece_start:piece_end));
+%                 plot(piece_fft);title('spectrum');xlabel('frequency / Hz');
             end
         end
     end

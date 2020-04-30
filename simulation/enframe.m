@@ -1,4 +1,4 @@
-function [f,t,eng]=enframe(x,win,inc)
+function [f,t,eng,zcr]=enframe(x,win,inc)
 %ENFRAME split signal up into (overlapping) frames: one per row. [F,T]=(X,WIN,INC)
 %
 %	F = ENFRAME(X,LEN) splits the vector X(:) up into
@@ -38,16 +38,23 @@ if (nwin > 1)
     w = win(:)';
     f = f .* w(ones(nf,1),:);
 end
-%if nargout>1
-    t = floor((1+len)/2)+indf;
-    %fprintf('size of f\n');
-    szf = size(f);
-    ff = f(:).*f(:);
-    for i = 1:szf(1)
-        %ff = f(i,:).*f(i,:)
-        ff = abs(f(i,:));
-        eng(i) = sum(ff);
-    end
-%end
 
+t = floor((1+len)/2)+indf;
+%fprintf('size of f\n');
+szf = size(f);
+% ff = f(:).*f(:);
+for i = 1:szf(1)
+    %ff = f(i,:).*f(i,:)
+%     ff = abs(f(i,:));
+%     eng(i) = sum(ff);
+    eng(i) = 0;
+    zcr(i) = 0;
+    for j = 1:szf(2)
+        eng(i) = eng(i)+abs(f(i,j));
+        if j+1 <= szf(2)
+            zcr(i) = zcr(i)+abs(sign(f(i,j+1))-sign(f(i,j)));
+        end
+    end
+    zcr(i) = 0.5*zcr(i);
+end
 
