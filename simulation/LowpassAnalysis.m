@@ -26,8 +26,8 @@ for i = 1:6
     % µÍÍ¨ÂË²¨
     fc = 1000; % ½ØÖ¹ÆµÂÊ
     [b,a] = butter(3,fc/(fs/2));
-    % figure(10);
-    % freqz(b,a);
+    figure(10);
+    freqz(b,a);
     figure(i);
     gun_filtered = filter(b,a,gun);
     
