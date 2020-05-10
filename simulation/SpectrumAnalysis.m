@@ -2,7 +2,7 @@
 
 
 for i = 1:6
-    file_name = strcat('gun',num2str(i));
+    file_name = strcat('dataset_horn',num2str(i));
     file_name = strcat(file_name,'.wav');
     fprintf('reading %s...\n',file_name);
     [y,fs] = audioread(file_name);   
@@ -13,11 +13,13 @@ for i = 1:6
         gun = (y(:,1))'; % µ¥ÉùµÀ
     end
     
-    figure(i);
+    %figure(i);
+    figure(1);
     p2 = abs(fft(gun)/length(gun));
     gun_fft = p2(1:length(gun)/2+1);
     gun_fft(2:end-1) = 2*gun_fft(2:end-1);
     f = fs*(0:(length(gun)/2))/length(gun);
-    subplot(1,2,1);plot(gun);xlabel('t / s');
-    subplot(1,2,2);plot(gun_fft);title('spectrum');xlabel('frequency / Hz');
+    %subplot(1,2,1);plot(gun);xlabel('t / s');
+    %subplot(1,2,2);
+    subplot(3,2,i);plot(gun_fft);title('spectrum');xlabel('frequency / Hz');
 end
